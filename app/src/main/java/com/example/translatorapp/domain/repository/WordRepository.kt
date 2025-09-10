@@ -1,11 +1,12 @@
 package com.example.translatorapp.domain.repository
-
 import com.example.translatorapp.domain.model.Word
+import kotlinx.coroutines.flow.Flow
 
 interface WordRepository {
-    suspend fun getWordById(id: String): Word?
-    suspend fun getWordByEnglish(english: String): Word?
-    suspend fun saveWord(word: Word)
-    suspend fun deleteWord(id: String)
-    suspend fun getAllWords(): List<Word>
+
+    suspend fun translate(word: String): Word
+    fun getHistory(): Flow<List<Word>>
+    fun getFavorites(): Flow<List<Word>>
+    suspend fun toggleFavorite(wordId: String)
+    suspend fun deleteWord(wordId: String)
 }
