@@ -18,6 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.translatorapp.ui.favorites_screen.FavoritesScreen
 import com.example.translatorapp.ui.theme.TranslatorAppTheme
 import com.example.translatorapp.ui.translator_screen.TranslatorScreen
 import dagger.hilt.android.AndroidEntryPoint
@@ -52,7 +53,7 @@ fun TranslatorApp() {
             modifier = Modifier.padding(padding)
         ) {
             composable("translator") { TranslatorScreen() }
-            //composable("favorites") { FavoritesScreen(navController) }
+            composable("favorites") { FavoritesScreen(navController) }
         }
     }
 }

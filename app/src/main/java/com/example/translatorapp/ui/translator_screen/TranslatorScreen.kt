@@ -23,6 +23,7 @@ fun TranslatorScreen(
     viewModel: TranslatorViewModel = hiltViewModel(),
 ) {
     val state = viewModel.state.collectAsState().value
+    val currentWord = state.history.find { it.english.lowercase() == state.inputWord.lowercase() }
 
     Column(
         modifier = Modifier
@@ -30,7 +31,7 @@ fun TranslatorScreen(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Карточка ввода
+
         Card(
             modifier = Modifier.fillMaxWidth(),
             elevation = CardDefaults.cardElevation(4.dp)
@@ -38,8 +39,8 @@ fun TranslatorScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(120.dp),
-                contentAlignment = Alignment.Center
+                    .height(120.dp)
+                    .padding(8.dp)
             ) {
                 TextField(
                     value = state.inputWord,
@@ -57,18 +58,32 @@ fun TranslatorScreen(
                         )
                     },
                     modifier = Modifier.fillMaxWidth(),
-                    textStyle = MaterialTheme.typography.headlineSmall.copy( // жирный и крупный текст пользователя
+                    textStyle = MaterialTheme.typography.headlineSmall.copy(
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center
                     ),
                     maxLines = 5
                 )
 
+
+
+                IconButton(
+                    onClick = {
+                        currentWord?.let { viewModel.onEvent(TranslatorEvent.ToggleFavorite(it.id)) }
+                    },
+                    modifier = Modifier.align(Alignment.TopEnd)
+                ) {
+                    Icon(
+                        imageVector = if (currentWord?.isFavorite == true) Icons.Filled.Favorite else Icons.Outlined.Favorite,
+                        contentDescription = "Избранное",
+                        tint = if (currentWord?.isFavorite == true) Color.Red else Color.Gray
+                    )
+                }
             }
         }
 
 
-        // Кнопка перевода или лоадер
+
         if (state.isLoading) {
             CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
         } else {
@@ -83,73 +98,56 @@ fun TranslatorScreen(
             }
         }
 
-        // Карточка перевода
         Card(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(120.dp),
             elevation = CardDefaults.cardElevation(4.dp)
         ) {
             Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(120.dp),
-                contentAlignment = Alignment.Center
+                    .fillMaxSize()
+                    .padding(8.dp)
             ) {
+                // Текст по центру
                 if (state.translation.isEmpty()) {
                     Text(
                         "Здесь будет перевод",
                         color = Color.Gray.copy(alpha = 0.5f),
                         style = MaterialTheme.typography.bodyLarge.copy(
-                            fontWeight = FontWeight.Normal,
-                            textAlign = TextAlign.Center
+                            fontWeight = FontWeight.Normal
                         ),
                         textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .align(Alignment.Center)
                     )
                 } else {
-                    Row(
+                    Text(
+                        text = state.translation,
+                        style = MaterialTheme.typography.headlineSmall.copy(
+                            fontWeight = FontWeight.Bold
+                        ),
+                        textAlign = TextAlign.Center,
                         modifier = Modifier
-                            .fillMaxSize()
-                            .padding(8.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = state.translation,
-                            style = MaterialTheme.typography.headlineSmall.copy(
-                                fontWeight = FontWeight.Bold,
-                                textAlign = TextAlign.Center
-                            ),
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                        IconButton(onClick = {
-                            viewModel.onEvent(TranslatorEvent.ToggleFavorite(state.inputWord))
-                        }) {
-                            Icon(
-                                imageVector = if (state.isFavorite)
-                                    Icons.Filled.Favorite
-                                else
-                                    Icons.Outlined.Favorite,
-                                contentDescription = "Избранное",
-                                tint = if (state.isFavorite) Color.Red else Color.Gray
-                            )
-                        }
-                    }
+                            .fillMaxWidth()
+                            .align(Alignment.Center)
+                    )
                 }
-            }
 
+            }
         }
         LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-        items(state.history) { word ->
-            Text(
-                text = "${word.english} → ${word.russian}",
-                style = MaterialTheme.typography.bodyMedium
-            )
+            items(state.history) { word ->
+                Text(
+                    text = "${word.english} → ${word.russian}",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
         }
-    }
 
     }
 

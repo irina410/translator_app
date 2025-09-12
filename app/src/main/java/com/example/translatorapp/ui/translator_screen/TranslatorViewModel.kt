@@ -57,7 +57,7 @@ class TranslatorViewModel @Inject constructor(
     private fun toggleFavorite(wordId: String) {
         viewModelScope.launch {
             repository.toggleFavorite(wordId)
-            _state.update { it.copy(isFavorite = !it.isFavorite) }
         }
     }
+
 }
