@@ -19,7 +19,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.translatorapp.ui.theme.TranslatorAppTheme
+import com.example.translatorapp.ui.translator_screen.TranslatorScreen
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,8 +51,8 @@ fun TranslatorApp() {
             startDestination = "translator",
             modifier = Modifier.padding(padding)
         ) {
-            composable("translator") { TranslatorScreen(navController) }
-            composable("favorites") { FavoritesScreen(navController) }
+            composable("translator") { TranslatorScreen() }
+            //composable("favorites") { FavoritesScreen(navController) }
         }
     }
 }
