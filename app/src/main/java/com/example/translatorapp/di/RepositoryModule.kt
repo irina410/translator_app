@@ -1,5 +1,6 @@
 package com.example.translatorapp.di
 
+import com.example.translatorapp.data.repository.WordRepositoryImpl
 import com.example.translatorapp.domain.repository.WordRepository
 import dagger.Binds
 import dagger.Module
