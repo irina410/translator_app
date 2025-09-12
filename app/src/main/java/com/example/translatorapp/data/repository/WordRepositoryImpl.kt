@@ -20,24 +20,35 @@ class WordRepositoryImpl @Inject constructor(
         val response = api.searchWord(word)
         val dto = response.firstOrNull() ?: throw Exception("Перевод не найден")
         val domainWord = dto.toDomainWord()
-        dao.insertWord(domainWord.toEntity())
+
+        val existing = dao.getWordById(domainWord.id)
+        if (existing != null) {
+            // Сохраняем перевод, но сохраняем старое isFavorite
+            val updated = domainWord.toEntity().copy(isFavorite = existing.isFavorite)
+            dao.insertWord(updated)
+        } else {
+            dao.insertWord(domainWord.toEntity())
+        }
 
         return domainWord
     }
+
 
     override fun getHistory(): Flow<List<Word>> {
         return dao.getAllWords().map { list -> list.map { it.toDomain() } }
     }
 
     override fun getFavorites(): Flow<List<Word>> {
-            return dao.getFavoriteWords()
-            .map { list -> list.map { it.toDomain() } }    }
+        return dao.getFavoriteWords()
+            .map { list -> list.map { it.toDomain() } }
+    }
 
     override suspend fun toggleFavorite(wordId: String) {
-        val entity = dao.getWordById(wordId) ?: return
-        val updated = entity.copy(isFavorite = !entity.isFavorite)
+        val existing = dao.getWordById(wordId) ?: return
+        val updated = existing.copy(isFavorite = !existing.isFavorite)
         dao.updateWord(updated)
     }
+
 
     override suspend fun deleteWord(wordId: String) {
         dao.deleteWordById(wordId)
