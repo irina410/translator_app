@@ -1,5 +1,7 @@
 package com.example.translatorapp.ui.translator_screen
 
+import android.widget.Toast
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.*
@@ -15,8 +17,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.Favorite
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.platform.LocalContext
 
 @Composable
 fun TranslatorScreen(
@@ -25,6 +29,7 @@ fun TranslatorScreen(
     val state = viewModel.state.collectAsState().value
     val currentWord =
         state.history.find { it.english.trim().lowercase() == state.inputWord.trim().lowercase() }
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -141,7 +146,19 @@ fun TranslatorScreen(
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 4.dp),
+                        .padding(horizontal = 4.dp)
+                        .pointerInput(Unit) {
+                            detectTapGestures(
+                                onLongPress = {
+                                    viewModel.onEvent(TranslatorEvent.DeleteWord(word.id))
+                                    Toast.makeText(
+                                        context,
+                                        "Удалено: ${word.english}",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            )
+                        },
                     colors = CardDefaults.cardColors(containerColor = Color.White),
                     elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
                     shape = RoundedCornerShape(12.dp)
@@ -173,6 +190,7 @@ fun TranslatorScreen(
                 }
             }
         }
+
 
     }
 }

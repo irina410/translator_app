@@ -48,6 +48,7 @@ class TranslatorViewModel @Inject constructor(
                 it.copy(history = it.history.filterNot { word -> word.id == wordId })
             }
         }
+
     }
 
     private fun translateWord() {
