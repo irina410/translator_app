@@ -36,6 +36,17 @@ class TranslatorViewModel @Inject constructor(
             is TranslatorEvent.ToggleFavorite -> {
                 toggleFavorite(event.wordId)
             }
+            is TranslatorEvent.DeleteWord -> {
+                deleteWord(event.wordId)
+            }
+        }
+    }
+    private fun deleteWord(wordId: String) {
+        viewModelScope.launch {
+            repository.deleteWord(wordId)
+            _state.update {
+                it.copy(history = it.history.filterNot { word -> word.id == wordId })
+            }
         }
     }
 
