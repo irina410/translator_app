@@ -47,7 +47,12 @@ class TranslatorViewModel @Inject constructor(
             _state.update { it.copy(isLoading = true, errorMessage = null) }
             try {
                 val translated = repository.translate(word)
-                _state.update { it.copy(translation = translated.russian.toString(), isLoading = false) }
+                _state.update {
+                    it.copy(
+                        translation = translated.russian.toString(),
+                        isLoading = false
+                    )
+                }
             } catch (e: Exception) {
                 _state.update { it.copy(isLoading = false, errorMessage = e.message) }
             }
@@ -57,7 +62,11 @@ class TranslatorViewModel @Inject constructor(
     private fun toggleFavorite(wordId: String) {
         viewModelScope.launch {
             repository.toggleFavorite(wordId)
+
+            val updatedHistory = _state.value.history.map { word ->
+                if (word.id == wordId) word.copy(isFavorite = !word.isFavorite) else word
+            }
+            _state.update { it.copy(history = updatedHistory) }
         }
     }
-
 }
