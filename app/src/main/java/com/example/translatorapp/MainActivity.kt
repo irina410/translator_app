@@ -6,11 +6,18 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.translatorapp.ui.theme.TranslatorAppTheme
 
 class MainActivity : ComponentActivity() {
@@ -18,30 +25,32 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            TranslatorAppTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+            TranslatorApp()
+        }
+
+    }
+}
+@Composable
+fun TranslatorApp() {
+    val navController = rememberNavController()
+
+    Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(onClick = {
+                navController.navigate("favorites")
+            }) {
+                Icon(Icons.Default.Favorite, contentDescription = "Избранное")
             }
+        }
+    ) { padding ->
+        NavHost(
+            navController = navController,
+            startDestination = "translator",
+            modifier = Modifier.padding(padding)
+        ) {
+            composable("translator") { TranslatorScreen(navController) }
+            composable("favorites") { FavoritesScreen(navController) }
         }
     }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    TranslatorAppTheme {
-        Greeting("Android")
-    }
-}
